@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accessible Color Palette Builder — Michelle Tolbert-Plant</title>
+  <style>
+    :root { --bg:#0b0c10; --panel:#111318; --muted:#9aa3af; --text:#e5e7eb; --accent:#60a5fa; --danger:#ef4444; --ring:#1f2937; --radius:16px; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,"Apple Color Emoji","Segoe UI Emoji";background:radial-gradient(1200px 800px at 85% -10%,#111827 0%,var(--bg) 45%),var(--bg);color:var(--text)}
+    header{max-width:1100px;margin:40px auto 16px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0;letter-spacing:.4px}.tag{color:var(--muted);font-size:12px}
+    .container{max-width:1100px;margin:0 auto;padding:0 20px 40px}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid #1f2937;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
+    .input-row{display:grid;grid-template-columns:1fr;gap:12px;padding:16px}
+    @media (min-width:920px){.input-row{grid-template-columns:1fr auto;align-items:start}}
+    textarea{width:100%;min-height:140px;resize:vertical;padding:14px 14px 58px;background:var(--panel);color:var(--text);border:1px solid var(--ring);border-radius:10px;outline:none;transition:box-shadow .2s,border-color .2s;line-height:1.45;font-size:14px}
+    textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(96,165,250,.25)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px}
+    button,.btn{appearance:none;border:1px solid #2a3340;background:#141923;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 6px 16px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.03);transition:transform .04s ease,background .15s ease,border-color .15s ease,opacity .2s ease}
+    button:hover{background:#19202c} button:active{transform:translateY(1px)}
+    .btn-primary{border-color:#35507b;background:linear-gradient(180deg,#1f2c3f,#151d2a)} .btn-ghost{background:transparent;border-color:#273244}
+    .helper{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin-top:-48px;padding:0 8px 8px;flex-wrap:wrap}
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+    .swatch{border-radius:14px;overflow:hidden;border:1px solid #1e293b;background:#0f172a}
+    .chip{height:110px;display:grid;place-items:center;position:relative}.chip .copy{position:absolute;top:8px;right:8px;backdrop-filter:blur(6px)}
+    .meta{padding:10px 12px;display:grid;gap:6px;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.28))}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)} .row strong{color:var(--text);font-size:12px;font-weight:700;letter-spacing:.2px}
+    .name{color:var(--text);font-weight:700;font-size:12px;letter-spacing:.2px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap}.badge{font-size:10px;letter-spacing:.3px;border:1px solid #2a3340;padding:4px 6px;border-radius:999px}
+    .empty{text-align:center;color:var(--muted);padding:40px 12px 48px;border:1px dashed #2a3340;border-radius:var(--radius)}
+    .error{color:var(--danger);font-weight:600}
+    .toolbar{display:flex;gap:12px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid #1f2937;background:rgba(0,0,0,.12);border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius)}
+    .footer{color:var(--muted);font-size:12px;text-align:center;margin-top:10px}
+    .hidden{display:none!important}
+    label.inline{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+    input[type="number"]{width:80px;padding:8px;background:#0f1520;color:var(--text);border:1px solid var(--ring);border-radius:10px}
+    input[type="text"].title{width:260px;padding:8px 10px;background:#0f1520;color:var(--text);border:1px solid var(--ring);border-radius:10px}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Accessible Color Palette Builder</h1>
+      <div class="tag">Built for instructional designers — verify WCAG contrast compliance before your colors go into Rise 360, Storyline, or Figma</div>
+    </div>
+    <div class="actions">
+      <button id="btnExportCSS" class="btn btn-ghost" title="Export CSS variables">Export CSS</button>
+      <button id="btnExportJSON" class="btn btn-ghost" title="Export JSON">Export JSON</button>
+      <button id="btnExportPNG" class="btn btn-primary" title="Export printable PNG">Export PNG</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div style="background:linear-gradient(90deg,rgba(96,165,250,0.08),rgba(96,165,250,0.03));border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:14px 20px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:11px;font-weight:700;color:#60a5fa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">How to use</div>
+        <div style="font-size:13px;color:#9aa3af;line-height:1.6">Paste your hex codes below — one per line, with an optional name. Hit <strong style="color:#e5e7eb">Build Palette</strong> to see each color with its WCAG contrast rating against white and black text. Use the verdict label to decide whether a color is safe for body text, large headings only, or decorative elements only.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:200px">
+        <div style="font-size:11px;font-weight:700;color:#60a5fa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:2px">WCAG quick reference</div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span style="color:#22c55e;font-weight:700;min-width:36px">AAA</span><span style="color:#9aa3af">CR ≥ 7:1 · Safe for all text</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span style="color:#60a5fa;font-weight:700;min-width:36px">AA</span><span style="color:#9aa3af">CR ≥ 4.5:1 · Safe for body text</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span style="color:#ef4444;font-weight:700;min-width:36px">Fails</span><span style="color:#9aa3af">CR &lt; 4.5:1 · Decorative use only</span></div>
+      </div>
+    </div>
+    <section class="panel">
+      <div class="input-row">
+        <div style="position:relative">
+          <textarea id="hexInput" placeholder="#FF5733 Sunset Orange
+#1E90FF Dodger Blue
+10B981  Emerald
+#abc   Mist
+
+Formats accepted:
+• “#RRGGBB Name”
+• “#RGB - Name”
+• or just a hex (name optional)
+Separate with spaces, commas, or new lines."></textarea>
+          <div class="helper">
+            <span>Tip: add a name after each hex to label the swatch on export</span>
+            <span id="errorText" class="error hidden">Invalid hex detected</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btnBuild" class="btn btn-primary">Build Palette</button>
+          <button id="btnShuffle" class="btn">Shuffle</button>
+          <button id="btnClear" class="btn">Clear</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <label class="inline"><input id="toggleText" type="checkbox" checked /> Show RGB/HSL details</label>
+        <label class="inline"><input id="toggleWCAG" type="checkbox" checked /> Show WCAG contrast tags</label>
+        <label class="inline">Columns <input id="cols" type="number" min="1" max="8" value="5" /></label>
+        <label class="inline">Tile W <input id="tileW" type="number" min="120" max="600" value="260" /></label>
+        <label class="inline">Tile H <input id="tileH" type="number" min="120" max="400" value="180" /></label>
+        <input id="sheetTitle" class="title" type="text" placeholder="Title for export (optional)" />
+      </div>
+    </section>
+
+    <div id="grid" class="grid" style="margin-top:16px"></div>
+
+    <div id="empty" class="empty">
+      Paste some hex codes above and click <strong>Build Palette</strong> ✨
+    </div>
+
+    <div class="footer">Built by <strong style="color:var(--text)">Michelle Tolbert-Plant</strong> · Technical Learning Engineer &amp; AI Solutions Consultant · Vanilla HTML/CSS/JS · <a href="https://github.com/YOUR_USERNAME/accessible-palette-builder" style="color:var(--accent);text-decoration:none" target="_blank">GitHub ↗</a></div>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+    const hexInput = $('#hexInput');
+    const grid = $('#grid');
+    const empty = $('#empty');
+    const errorText = $('#errorText');
+
+    const state = { colors: [] }; // [{hex, name?}]
+
+    function normalizeHex(input) {
+      let s = String(input).trim().replace(/^#/, '').toLowerCase();
+      if (s.length === 3) s = s.split('').map(ch => ch + ch).join('');
+      if (!/^([0-9a-f]{6})$/.test(s)) return null;
+      return '#' + s.toUpperCase();
+    }
+    function extractHexAndName(chunk) {
+      const m = chunk.match(/#?[0-9a-fA-F]{3,6}/);
+      if (!m) return null;
+      const hex = normalizeHex(m[0]);
+      if (!hex) return null;
+      const namePart = chunk.slice(m.index + m[0].length).replace(/^[\\s,;:\\-]+/, '').trim();
+      const name = namePart || '';
+      return { hex, name };
+    }
+
+    function hexToRgb(hex) { hex = hex.replace('#',''); return { r:parseInt(hex.slice(0,2),16), g:parseInt(hex.slice(2,4),16), b:parseInt(hex.slice(4,6),16) }; }
+    function rgbToHsl(r,g,b){ r/=255; g/=255; b/=255; const max=Math.max(r,g,b), min=Math.min(r,g,b); let h,s,l=(max+min)/2;
+      if(max===min){h=s=0;} else { const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+        switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;} h/=6; }
+      return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)}; }
+    function srgbToLin(c){ c/=255; return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4); }
+    function luminance({r,g,b}){ const R=srgbToLin(r),G=srgbToLin(g),B=srgbToLin(b); return 0.2126*R+0.7152*G+0.0722*B; }
+    function contrastRatio(l1,l2){ const [L1,L2]=l1>l2?[l1,l2]:[l2,l1]; return (L1+0.05)/(L2+0.05); }
+    function textColorForBg(rgb){ const Lbg=luminance(rgb), Lw=luminance({r:255,g:255,b:255}), Lb=luminance({r:0,g:0,b:0});
+      const cW=contrastRatio(Lw,Lbg), cB=contrastRatio(Lb,Lbg); return cW>=cB?{color:'#FFFFFF',contrast:cW}:{color:'#000000',contrast:cB}; }
+
+    function parseInput(raw){
+      const chunks = raw.split(/\\n|,/).map(s=>s.trim()).filter(Boolean);
+      const colors=[]; const invalids=[]; const seen=new Set();
+      for(const chunk of chunks){ const item=extractHexAndName(chunk); if(!item){invalids.push(chunk); continue;} if(!seen.has(item.hex)){colors.push(item); seen.add(item.hex);} }
+      if(!colors.length){ for(const token of raw.split(/\\s+/).filter(Boolean)){ const item=extractHexAndName(token); if(item && !seen.has(item.hex)){ colors.push(item); seen.add(item.hex); } } }
+      return { colors, invalids };
+    }
+
+    function render(){
+      grid.innerHTML='';
+      if(!state.colors.length){ empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      const showDetails=$('#toggleText').checked; const showWCAG=$('#toggleWCAG').checked;
+
+      state.colors.forEach((item, idx)=>{
+        const {hex, name=''}=item;
+        const rgb=hexToRgb(hex), hsl=rgbToHsl(rgb.r,rgb.g,rgb.b);
+        const {color:textColor, contrast}=textColorForBg(rgb);
+        const card=document.createElement('div'); card.className='swatch';
+        card.innerHTML=`
+          <div class="chip" style="background:${hex}; color:${textColor}">
+            <button class="btn copy" title="Copy hex" data-hex="${hex}">Copy</button>
+            <div style="font-size:14px;font-weight:800;letter-spacing:.4px;filter: drop-shadow(0 2px 6px rgba(0,0,0,.25))">${hex}</div>
+          </div>
+          <div class="meta">
+            <div class="name">${name || '&nbsp;'}</div>
+            <div class="row ${showDetails ? '' : 'hidden'}"><span>RGB</span><strong>${rgb.r}, ${rgb.g}, ${rgb.b}</strong></div>
+            <div class="row ${showDetails ? '' : 'hidden'}"><span>HSL</span><strong>${hsl.h}°, ${hsl.s}%, ${hsl.l}%</strong></div>
+            <div class="badges ${showWCAG ? '' : 'hidden'}">
+              ${contrast >= 7 ? '<span class="badge" style="border-color:#22c55e;color:#22c55e">AAA</span>' : contrast >= 4.5 ? '<span class="badge" style="border-color:#60a5fa;color:#60a5fa">AA</span>' : '<span class="badge" style="border-color:#ef4444;color:#ef4444">Fails</span>'}
+              <span class="badge">CR ${contrast.toFixed(2)}:1</span>
+              <span class="badge">Index ${idx+1}</span>
+            </div>
+            <div class="${showWCAG ? '' : 'hidden'}" style="font-size:11px;margin-top:4px;color:${contrast >= 7 ? '#22c55e' : contrast >= 4.5 ? '#60a5fa' : '#ef4444'}">
+              ${contrast >= 7 ? '✓ Safe for all text sizes' : contrast >= 4.5 ? '✓ Safe for body text' : '✗ Decorative use only — fails for text'}
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+
+      $$('.copy').forEach(btn=>btn.addEventListener('click', async e=>{
+        const hex=e.currentTarget.getAttribute('data-hex');
+        try{ await navigator.clipboard.writeText(hex); flash(btn,'Copied!'); }catch{ flash(btn,'Unable to copy'); }
+      }));
+    }
+
+    function flash(el,text){ const original=el.textContent; el.textContent=text; el.disabled=true; setTimeout(()=>{el.textContent=original; el.disabled=false;},900); }
+    function buildFromInput(){ const {colors,invalids}=parseInput(hexInput.value); state.colors=colors; errorText.classList.toggle('hidden', invalids.length===0); render(); }
+    function shuffle(){ for(let i=state.colors.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [state.colors[i],state.colors[j]]=[state.colors[j],state.colors[i]];} render(); }
+
+    function exportCSS(){ const lines=state.colors.map((item,i)=>`  --color-${i+1}: ${item.hex};`); const css=`:root{\\n${lines.join('\\n')}\\n}`; downloadText('palette.css',css); }
+    function exportJSON(){ const json=JSON.stringify({palette:state.colors}, null, 2); downloadText('palette.json', json); }
+    function downloadText(filename,text){ const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500); }
+
+    // ---- PNG Export (printable sheet) ----
+    function roundRect(ctx,x,y,w,h,r,fill,stroke){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
+    function centerText(ctx,text,x,y,w,h){ const m=ctx.measureText(text); const tx=x+(w-m.width)/2; const ty=y+h/2; ctx.fillText(text,tx,ty); }
+    function exportPNG(){
+      if(!state.colors.length) return;
+      const cols=Math.max(1,Math.min(8,parseInt($('#cols').value||'5',10)));
+      const tileW=Math.max(120,Math.min(600,parseInt($('#tileW').value||'260',10)));
+      const tileH=Math.max(120,Math.min(400,parseInt($('#tileH').value||'180',10)));
+      const rows=Math.ceil(state.colors.length/cols);
+      const margin=60,gutter=24,titleH=72;
+      const sheetTitle=($('#sheetTitle').value||'Color Palette');
+      const width=margin*2+cols*tileW+(cols-1)*gutter;
+      const height=margin*2+titleH+rows*tileH+(rows-1)*gutter;
+      const canvas=document.createElement('canvas'); const scale=2; canvas.width=width*scale; canvas.height=height*scale;
+      const ctx=canvas.getContext('2d'); ctx.scale(scale,scale);
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,width,height);
+      ctx.fillStyle='#111'; ctx.font='700 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto'; ctx.textBaseline='top';
+      ctx.fillText(sheetTitle, margin, margin);
+      const dateStr=new Date().toLocaleDateString(); ctx.font='12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillStyle='#555';
+      ctx.fillText(dateStr, width - margin - ctx.measureText(dateStr).width, margin + 4);
+
+      let x=margin, y=margin+titleH;
+      state.colors.forEach((item,i)=>{
+        const {hex,name=''}=item;
+        const chipH=Math.floor(tileH*0.6);
+        roundRect(ctx,x,y,tileW,tileH,16,'#f5f7fb','#e5e7eb');
+        roundRect(ctx,x+12,y+12,tileW-24,chipH-16,12,hex,'#d1d5db');
+        const {r,g,b}=hexToRgb(hex); const {color:txt}=textColorForBg({r,g,b});
+        ctx.fillStyle=txt; ctx.font='700 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto'; ctx.textBaseline='middle';
+        centerText(ctx, hex, x+12, y+12, tileW-24, chipH-16);
+        ctx.textBaseline='alphabetic'; ctx.fillStyle='#111'; ctx.font='700 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto';
+        ctx.fillText(name, x+16, y+chipH+18);
+        ctx.font='12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillStyle='#374151';
+        ctx.fillText(hex, x+16, y+chipH+36);
+        if((i+1)%cols===0){ x=margin; y+=tileH+gutter; } else { x+=tileW+gutter; }
+      });
+
+      const a=document.createElement('a'); a.href=canvas.toDataURL('image/png');
+      a.download=(sheetTitle.replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'')||'palette')+'.png';
+      a.click();
+    }
+
+    // Wire up UI
+    $('#btnBuild').addEventListener('click', buildFromInput);
+    $('#btnShuffle').addEventListener('click', shuffle);
+    $('#btnClear').addEventListener('click', () => { hexInput.value=''; state.colors=[]; render(); });
+    $('#btnExportCSS').addEventListener('click', exportCSS);
+    $('#btnExportJSON').addEventListener('click', exportJSON);
+    $('#btnExportPNG').addEventListener('click', exportPNG);
+    $('#toggleText').addEventListener('change', render);
+    $('#toggleWCAG').addEventListener('change', render);
+
+    // Demo values
+    hexInput.value = '#FF5733 Sunset Orange\\n#1E90FF Dodger Blue\\n10B981 Emerald\\n#F59E0B - Amber\\n#AB47BC Grape\\n#111827 Slate\\n#f0f9ff Foam\\n#34D399 - Mint\\n#E11D48 Rose\\n#9333EA Violet';
+    buildFromInput();
+  </script>
+</body>
+</html>
